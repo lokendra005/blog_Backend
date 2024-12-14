@@ -10,8 +10,8 @@ dotenv.config();
 const app = express();
 
 const allowedOrigins = [
-  'http://localhost:5173', 
-  'https://blogbackend-aceqmeb7e-lokendra005s-projects.vercel.app',
+  '*',
+  'http://localhost:5173',
 ]
 const corsOptions = {
   origin: allowedOrigins, 
