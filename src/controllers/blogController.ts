@@ -1,19 +1,17 @@
-// backend/src/controllers/blogController.ts
 import { Request, Response } from 'express';
 import Blog from '../models/Blog';
+import cloudinary from '../config/cloudinary';
+
 
 export const createBlog = async (req: Request, res: Response) => {
   try {
-    console.log('Received blog data:', req.body);
-    console.log('Received file:', req.file);  // Log file info
-
     const { title, description, authorName, readTime, mediumLink } = req.body;
-    
-    if (!title || !description || !authorName || !readTime || !mediumLink) {
-      return res.status(400).json({ 
-        message: 'All fields are required',
-        received: req.body 
-      });
+    let imageUrl;
+
+    if (req.file) {
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path);
+      imageUrl = result.secure_url;
     }
 
     const blog = new Blog({
@@ -22,13 +20,13 @@ export const createBlog = async (req: Request, res: Response) => {
       authorName,
       readTime,
       mediumLink,
-      image: req.file ? `/uploads/${req.file.filename}` : undefined  // Save image path if file exists
+      image: imageUrl
     });
 
     const savedBlog = await blog.save();
     res.status(201).json(savedBlog);
   } catch (error) {
-    console.error('Error creating blog:', error);
+    console.error('Error:', error);
     res.status(500).json({ message: 'Error creating blog post' });
   }
 };
